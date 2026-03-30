@@ -169,6 +169,11 @@ std::expected<void, std::string> IpcCommandHandler::handleUrl(const QUrl &url) {
       }
     }
 
+    if (!arguments.empty()) {
+      m_ctx.navigation->createCompletion(entrypoint->arguments(), entrypoint->iconUrl());
+      m_ctx.navigation->setCompletionValues(arguments);
+    }
+
     auto panel = entrypoint->newActionPanel(&m_ctx, root->itemMetadata(id));
     panel->finalize(); // not pretty, one day we will fix this too
     auto action = panel->primaryAction();
