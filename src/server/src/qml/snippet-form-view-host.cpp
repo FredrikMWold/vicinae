@@ -3,11 +3,33 @@
 #include "placeholder.hpp"
 #include "service-registry.hpp"
 #include "services/app-service/app-service.hpp"
+#include "services/snippet/snippet-expander.hpp"
 #include "services/snippet/snippet-service.hpp"
 #include "services/toast/toast-service.hpp"
 #include "ui/action-pannel/action.hpp"
 #include "view-utils.hpp"
 #include <QUrl>
+
+namespace {
+
+std::optional<QString> validateArgumentTransforms(const PlaceholderString &parsed) {
+  for (const auto &placeholder : parsed.placeholders()) {
+    const auto transformIt = placeholder.args.find(QStringLiteral("transform"));
+    if (transformIt == placeholder.args.end()) continue;
+
+    if (placeholder.id != QStringLiteral("argument")) {
+      return QStringLiteral("Transforms are only supported on {argument ...} placeholders");
+    }
+
+    if (!SnippetExpander::applyArgumentTransform(QString(), transformIt->second).valid) {
+      return QStringLiteral("Unsupported argument transform: %1").arg(transformIt->second);
+    }
+  }
+
+  return std::nullopt;
+}
+
+} // namespace
 
 SnippetFormViewHost::SnippetFormViewHost() : FormViewBase() {}
 
@@ -101,6 +123,12 @@ void SnippetFormViewHost::submit() {
     if (cursorCount > 1) {
       m_contentError = tr("Only one {cursor} placeholder is allowed");
       valid = false;
+    }
+    if (valid) {
+      if (const auto transformError = validateArgumentTransforms(parsed)) {
+        m_contentError = *transformError;
+        valid = false;
+      }
     }
   }
   if (!m_keyword.isEmpty()) {

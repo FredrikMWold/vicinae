@@ -18,6 +18,11 @@ public:
     bool placeholder = false;
   };
 
+  struct ArgumentTransformResult {
+    QString text;
+    bool valid = true;
+  };
+
   struct Result {
     std::vector<ResultPart> parts;
     std::optional<int> cursorPos;
@@ -82,7 +87,11 @@ public:
                 if (const auto it2 = std::ranges::find_if(
                         arguments, [&](auto &&pair) { return pair.first == it->second; });
                     it2 != arguments.end()) {
-                  result.parts.emplace_back(it2->second);
+                  const auto transformIt = placeholder.args.find("transform");
+                  const auto transformed = transformIt != placeholder.args.end()
+                                               ? applyArgumentTransform(it2->second, transformIt->second)
+                                               : applyArgumentTransform(it2->second);
+                  result.parts.emplace_back(transformed.text);
                 }
               } else {
                 qDebug() << "no name!";
@@ -99,6 +108,23 @@ public:
     }
 
     return result;
+  }
+
+  static ArgumentTransformResult
+  applyArgumentTransform(const QString &value, const std::optional<QString> &transform = std::nullopt) {
+    if (!transform) return {.text = value};
+
+    if (*transform == QStringLiteral("capitalize")) {
+      if (value.isEmpty()) return {.text = value};
+
+      QString transformed = value;
+      transformed[0] = transformed[0].toUpper();
+      return {.text = transformed};
+    }
+    if (*transform == QStringLiteral("uppercase")) return {.text = value.toUpper()};
+    if (*transform == QStringLiteral("lowercase")) return {.text = value.toLower()};
+
+    return {.text = value, .valid = false};
   }
 
 private:
