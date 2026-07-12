@@ -525,6 +525,8 @@ set(SRCS
 	src/qml/clipboard-history-model.cpp
 	src/qml/clipboard-history-view-host.hpp
 	src/qml/clipboard-history-view-host.cpp
+	src/qml/snippet-argument-form-view-host.hpp
+	src/qml/snippet-argument-form-view-host.cpp
 	src/qml/snippet-form-view-host.hpp
 	src/qml/snippet-form-view-host.cpp
 	src/qml/alias-form-view-host.hpp
@@ -1024,6 +1026,7 @@ set(VICINAE_QML_FILES
 	src/qml/qml/FormTextArea.qml
 	src/qml/qml/FormCheckbox.qml
 	src/qml/qml/FormSeparator.qml
+	src/qml/qml/SnippetArgumentFormView.qml
 	src/qml/qml/SnippetFormView.qml
 	src/qml/qml/AliasFormView.qml
 	src/qml/qml/ShortcutFormView.qml

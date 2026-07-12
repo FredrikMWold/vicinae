@@ -1,16 +1,26 @@
 #pragma once
 #include "services/app-runtime/app-runtime.hpp"
-#include "services/app-service/app-service.hpp"
 #include "services/clipboard/clipboard-service.hpp"
 #include "services/snippet/snippet-expander.hpp"
 #include "services/window-manager/abstract-window-manager.hpp"
 #include "services/window-manager/window-manager.hpp"
 #include "abstract-snippet-server.hpp"
 #include "snippet-db.hpp"
+#include <optional>
 #include <qguiapplication.h>
 #include <qobject.h>
 #include <QTimer>
 #include <qtmetamacros.h>
+
+struct SnippetArgumentExpansionRequest {
+  snippet::SerializedSnippet snippet;
+  std::string keyword;
+  int charsToDelete = 0;
+  bool terminal = false;
+  std::vector<PlaceholderString::Argument> arguments;
+};
+
+Q_DECLARE_METATYPE(SnippetArgumentExpansionRequest)
 
 class SnippetService : public QObject {
   Q_OBJECT
@@ -20,6 +30,7 @@ signals:
   void snippetUpdated();
   void snippetRemoved();
   void snippetsChanged();
+  void argumentExpansionRequested(SnippetArgumentExpansionRequest request);
 
 public:
   SnippetService(const std::filesystem::path &path, AbstractSnippetServer &snippetServer, WindowManager &wm,
@@ -104,10 +115,23 @@ public:
 
   SnippetDatabase *database() { return &m_db; }
 
+  void completeArgumentExpansion(const SnippetArgumentExpansionRequest &request,
+                                 const std::vector<std::pair<QString, QString>> &arguments) {
+    expandAndInject(request.snippet, request.keyword, request.charsToDelete, request.terminal, arguments);
+    m_server.resetContext();
+    syncServerState();
+  }
+
 private:
   struct UndoRecord {
     std::string trigger;
     QString expandedText;
+  };
+
+  struct ResolvedTrigger {
+    snippet::SerializedSnippet *snippet = nullptr;
+    bool terminal = false;
+    int charsToDelete = 0;
   };
 
   void syncServerState() {
@@ -131,12 +155,9 @@ private:
     m_server.injectUndo(backspaceCount, trigger);
   }
 
-  void handleKeywordTrigger(const std::string &keyword) {
-    if (!m_enabled) return;
-
-    const auto snippet = m_db.findByKeyword(keyword);
-    if (!snippet || !snippet->expansion) return;
-
+  std::optional<ResolvedTrigger> resolveTrigger(const std::string &keyword) {
+    auto *snippet = m_db.findByKeyword(keyword);
+    if (!snippet || !snippet->expansion) return std::nullopt;
     bool terminal = false;
 
     // we have focus, and we are a layer so it means that the current window might be:
@@ -160,7 +181,7 @@ private:
     const auto &apps = snippet->expansion->apps;
 
     if (!apps.empty()) {
-      if (!frontmost || !std::ranges::contains(apps, frontmost->id().toStdString())) return;
+      if (!frontmost || !std::ranges::contains(apps, frontmost->id().toStdString())) return std::nullopt;
     }
 
     qInfo().nospace() << "Snippet expansion: keyword=\"" << keyword
@@ -168,16 +189,24 @@ private:
 
     const int charsToDelete = static_cast<int>(keyword.size()) + (snippet->expansion->word ? 1 : 0);
 
-    const auto *text = std::get_if<snippet::TextSnippet>(&snippet->data);
+    return ResolvedTrigger{.snippet = snippet, .terminal = terminal, .charsToDelete = charsToDelete};
+  }
+
+  void expandAndInject(const snippet::SerializedSnippet &snippet, const std::string &keyword,
+                       int charsToDelete, bool terminal,
+                       const std::vector<std::pair<QString, QString>> &arguments) {
+    if (!snippet.expansion) return;
+
+    const auto *text = std::get_if<snippet::TextSnippet>(&snippet.data);
     if (!text) return;
 
     SnippetExpander expander;
-    const auto result = expander.expand(QString::fromStdString(text->text), {});
+    const auto result = expander.expand(QString::fromStdString(text->text), arguments);
 
     auto expanded = result.parts | std::views::transform([](auto &&part) { return part.text; }) |
                     std::views::join | std::ranges::to<QString>();
 
-    if (snippet->expansion->word) { expanded.append(' '); }
+    if (snippet.expansion->word) { expanded.append(' '); }
 
     const bool usesClipboard = m_server.usesClipboard();
 
@@ -201,6 +230,41 @@ private:
     if (usesClipboard) {
       QTimer::singleShot(0, this, [this]() { m_clipboard.scheduleClipboardRestore(); });
     }
+  }
+
+  void handleKeywordTrigger(const std::string &keyword) {
+    if (!m_enabled) return;
+
+    const auto resolved = resolveTrigger(keyword);
+    if (!resolved || !resolved->snippet) return;
+
+    const auto *text = std::get_if<snippet::TextSnippet>(&resolved->snippet->data);
+    if (!text) return;
+
+#ifdef Q_OS_LINUX
+    const auto parsed = PlaceholderString::parseSnippetText(QString::fromStdString(text->text));
+    if (!parsed.arguments().empty()) {
+      std::vector<PlaceholderString::Argument> arguments;
+      arguments.reserve(parsed.arguments().size());
+      for (const auto &argument : parsed.arguments()) {
+        arguments.emplace_back(argument);
+      }
+
+      m_undoRecord.reset();
+      m_server.resetContext();
+
+      emit argumentExpansionRequested(SnippetArgumentExpansionRequest{
+          .snippet = *resolved->snippet,
+          .keyword = keyword,
+          .charsToDelete = resolved->charsToDelete,
+          .terminal = resolved->terminal,
+          .arguments = std::move(arguments),
+      });
+      return;
+    }
+#endif
+
+    expandAndInject(*resolved->snippet, keyword, resolved->charsToDelete, resolved->terminal, {});
   }
 
   AbstractSnippetServer &m_server;

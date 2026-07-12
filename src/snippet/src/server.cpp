@@ -123,6 +123,7 @@ std::expected<void, std::string> SnippetService::setKeymap(snippet_gen::LayoutIn
 std::expected<snippet_gen::CreateSnippetResponse, std::string>
 SnippetService::createSnippet(snippet_gen::CreateSnippetRequest req) {
   std::cerr << "Created new snippet with trigger " << req.trigger << '\n';
+  std::erase_if(m_snippets, [&](auto &&s) { return s.trigger == req.trigger; });
   m_snippets.push_back(Snippet{.trigger = req.trigger, .mode = req.mode});
   std::ranges::sort(m_snippets, [](auto &&a, auto &&b) { return a.trigger.size() > b.trigger.size(); });
   return snippet_gen::CreateSnippetResponse{};
@@ -136,6 +137,14 @@ SnippetService::removeSnippet(snippet_gen::RemoveSnippetRequest req) {
 
 std::expected<void, std::string> SnippetService::resetContext() {
   m_text.clear();
+  m_undoTrigger.reset();
+  m_pendingExpansion.reset();
+
+  if (auto *state = xkb_state_new(m_keymap)) {
+    xkb_state_unref(m_kbState);
+    m_kbState = state;
+  }
+
   return {};
 }
 

@@ -87,6 +87,9 @@
 #endif
 #include "settings-controller/settings-controller.hpp"
 #include "services/tray/tray-service.hpp"
+#ifdef Q_OS_LINUX
+#include "qml/snippet-argument-form-view-host.hpp"
+#endif
 #include "qml/launcher-window.hpp"
 #include "qml/onboarding-window.hpp"
 #include "utils.hpp"
@@ -423,6 +426,15 @@ int startServer(const ServerLaunchOptions &launchOpts) {
   ctx.overlay = std::make_unique<OverlayController>(&ctx);
   ctx.settings = std::make_unique<SettingsController>(ctx);
   ctx.services = ServiceRegistry::instance();
+
+#ifdef Q_OS_LINUX
+  QObject::connect(ctx.services->snippetService(), &SnippetService::argumentExpansionRequested,
+                   ctx.navigation.get(), [&ctx](const SnippetArgumentExpansionRequest &request) {
+                     ctx.navigation->popToRoot({.clearSearch = false});
+                     ctx.navigation->pushView(new SnippetArgumentFormViewHost(request));
+                     ctx.navigation->showWindow();
+                   });
+#endif
 
   IpcCommandServer commandServer(&ctx);
 
