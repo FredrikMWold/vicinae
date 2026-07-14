@@ -215,6 +215,7 @@ public:
 
   bool executePrimaryAction();
   void executeAction(AbstractAction *action);
+  void recordCommandHistory(const EntrypointId &commandId);
 
 private:
   bool eventFilter(QObject *object, QEvent *event) override;

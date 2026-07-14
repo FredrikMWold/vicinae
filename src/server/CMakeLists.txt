@@ -351,6 +351,7 @@ set(SRCS
 	src/builtins/clipboard/history/clipboard-history-controller.hpp
 	src/builtins/clipboard/history/clipboard-history-controller.cpp
 	src/builtins/browser/browser-extension.cpp
+	src/extensions/history/history-extension.hpp
 
 	src/builtins/wm/wm-extension.hpp
 	src/builtins/wm/wm-extension.cpp
@@ -433,6 +434,8 @@ set(SRCS
 	src/builtins/root/provider-search-model.cpp
 	src/builtins/root/provider-search-view-host.hpp
 	src/builtins/root/provider-search-view-host.cpp
+	src/builtins/vicinae/search-history-view-host.hpp
+	src/builtins/vicinae/search-history-view-host.cpp
 
 	src/server.cpp
 
@@ -496,6 +499,8 @@ set(SRCS
 	src/services/extension-registry/extension-registry.cpp
 	src/services/extension-registry/extension-manifest.hpp
 	src/services/extension-registry/extension-manifest.cpp
+	src/services/root-search-history/root-search-history-service.hpp
+	src/services/root-search-history/root-search-history-service.cpp
 
 	src/services/oauth/oauth-token-store.hpp
 	src/services/oauth/oauth-token-store.cpp

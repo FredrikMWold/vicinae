@@ -5,6 +5,7 @@ enum class Keybind : uint8_t {
   ToggleActionPanel = 0,
   OpenSearchAccessorySelector,
   OpenSettings,
+  OpenCommandHistory,
 
   // common action keybinds
   OpenAction,

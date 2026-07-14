@@ -58,6 +58,7 @@
 #include "services/extension-registry/extension-registry.hpp"
 #include "services/files-service/file-service.hpp"
 #include "services/local-storage/local-storage-service.hpp"
+#include "services/root-search-history/root-search-history-service.hpp"
 #include "services/oauth/oauth-service.hpp"
 #include "services/ai/ollama/ollama-ai-provider.hpp"
 #include "services/power-manager/power-manager.hpp"
@@ -349,6 +350,7 @@ int startServer(const ServerLaunchOptions &launchOpts) {
     auto fileService = std::make_unique<FileService>();
     auto oauthService = std::make_unique<OAuthService>(*omniDb);
     auto extensionRegistry = std::make_unique<ExtensionRegistry>(*localStorage);
+    auto rootSearchHistory = std::make_unique<RootSearchHistoryService>(*localStorage);
     auto raycastStore = std::make_unique<RaycastStoreService>();
     auto vicinaeStore = std::make_unique<VicinaeStoreService>();
 
@@ -374,6 +376,7 @@ int startServer(const ServerLaunchOptions &launchOpts) {
     registry->setAppDb(std::move(appService));
     registry->setOmniDb(std::move(omniDb));
     registry->setLocalStorage(std::move(localStorage));
+    registry->setRootSearchHistory(std::move(rootSearchHistory));
     registry->setExtensionManager(std::move(extensionManager));
     registry->setClipman(std::move(clipboardManager));
     registry->setPasteService(std::move(pasteService));

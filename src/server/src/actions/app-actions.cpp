@@ -5,9 +5,11 @@
 #include "ui/action-panel/action.hpp"
 #include "services/app-runtime/app-runtime.hpp"
 #include "services/app-service/app-service.hpp"
+#include "services/root-search-history/root-search-history-service.hpp"
 #include "services/toast/toast-service.hpp"
 #include "ui/image/url.hpp"
 #include <QTimer>
+#include <filesystem>
 #include <iterator>
 #include <ranges>
 
@@ -192,6 +194,29 @@ OpenWithAction::OpenWithAction(QString target)
 
 void OpenWithAction::setTypeFiltering(bool filter) { m_typeFiltered = filter; }
 
+void OpenWithAction::setFileHistoryRecording(bool record) { m_recordFileHistory = record; }
+
+namespace {
+class RecordFileHistoryAction : public ProxyAction {
+public:
+  RecordFileHistoryAction(AbstractAction *action, QString target)
+      : ProxyAction(action), m_target(std::move(target)) {
+    setAutoClose(action->autoClose());
+    setStyle(action->style());
+    if (auto shortcut = action->shortcut()) addShortcut(*shortcut);
+  }
+
+  void executeAfter(ApplicationContext *ctx) override {
+    if (auto *history = ctx->services->rootSearchHistory()) {
+      history->recordFile(std::filesystem::path(m_target.toStdString()));
+    }
+  }
+
+private:
+  QString m_target;
+};
+} // namespace
+
 std::unique_ptr<ActionPanelState> OpenWithAction::buildState(ApplicationContext *ctx) const {
   auto panel = std::make_unique<ActionPanelState>();
   auto section = panel->createSection();
@@ -204,7 +229,11 @@ std::unique_ptr<ActionPanelState> OpenWithAction::buildState(ApplicationContext 
 
   for (const auto &opener : getOpeners()) {
     auto action = new OpenAppAction(opener, opener->displayName(), {m_target});
-    section->addAction(action);
+    if (m_recordFileHistory) {
+      section->addAction(new RecordFileHistoryAction(action, m_target));
+    } else {
+      section->addAction(action);
+    }
   }
 
   return panel;

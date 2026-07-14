@@ -46,6 +46,7 @@ class AppRuntime;
 class GlobalShortcutService;
 class LocalModelRegistry;
 class DictationService;
+class RootSearchHistoryService;
 
 namespace config {
 class Manager;
@@ -108,6 +109,7 @@ public:
   AI::ConversationStore *conversations() const;
   LocalModelRegistry *localModels() const;
   DictationService *dictation() const;
+  RootSearchHistoryService *rootSearchHistory() const;
 
   void setPowerManager(std::unique_ptr<PowerManager> manager);
   void setTrayHost(std::unique_ptr<AbstractTrayHost> service);
@@ -156,6 +158,7 @@ public:
   void setTools(std::unique_ptr<AI::ToolRegistry> registry);
   void setLocalModels(std::unique_ptr<LocalModelRegistry> registry);
   void setDictation(std::unique_ptr<DictationService> service);
+  void setRootSearchHistory(std::unique_ptr<RootSearchHistoryService> service);
 
 private:
   static inline ServiceRegistry *s_instance = nullptr;
@@ -164,6 +167,7 @@ private:
   std::unique_ptr<AppService> m_appDb;
   std::unique_ptr<OmniDatabase> m_omniDb;
   std::unique_ptr<LocalStorageService> m_localStorage;
+  std::unique_ptr<RootSearchHistoryService> m_rootSearchHistory;
   std::unique_ptr<ExtensionManager> m_extensionManager;
   std::unique_ptr<ClipboardService> m_clipman;
   std::unique_ptr<FontService> m_fontService;

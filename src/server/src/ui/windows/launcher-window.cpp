@@ -703,6 +703,10 @@ bool LauncherWindow::forwardKey(int rawKey, int modifiers, int scanCode) {
     return true;
   }
 
+  if (press.matches(Keyboard::Shortcut(Keybind::OpenCommandHistory))) {
+    return m_ctx.navigation->activateEntrypoint(EntrypointId{"history", "search"});
+  }
+
   return false;
 }
 

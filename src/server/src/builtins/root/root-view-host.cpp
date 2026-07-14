@@ -3,6 +3,7 @@
 #include "lib/figura/src/utils.hpp"
 #include "builtins/root/root-search-model.hpp"
 #include "ui/views/section-source.hpp"
+#include "root-search/extensions/extension-root-provider.hpp"
 #include "service-registry.hpp"
 #include "services/keybinding/keybinding-service.hpp"
 #include "ui/views/view-scope.hpp"

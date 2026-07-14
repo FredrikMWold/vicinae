@@ -1,6 +1,7 @@
 #include <QTimer>
 #include <QGuiApplication>
 #include <QQuickItem>
+#include "services/root-search-history/root-search-history-service.hpp"
 #include <chrono>
 #include <qlogging.h>
 #include <QProcessEnvironment>
@@ -419,6 +420,12 @@ bool NavigationController::executePrimaryAction() {
   return false;
 }
 
+void NavigationController::recordCommandHistory(const EntrypointId &commandId) {
+  auto history = m_ctx.services->rootSearchHistory();
+  if (!history) return;
+  history->recordCommand(commandId);
+}
+
 void NavigationController::setHeaderVisiblity(bool value, const BaseView *caller) {
   if (auto state = findViewState(VALUE_OR(caller, topView()))) {
     state->needsTopBar = value;
@@ -756,6 +763,8 @@ void NavigationController::launch(const std::shared_ptr<AbstractCmd> &cmd, const
       qDebug() << "MISSING PREFERENCE" << preference.title();
     }
   }
+
+  recordCommandHistory(cmd->uniqueId());
 
   auto frame = std::make_unique<CommandFrame>();
 

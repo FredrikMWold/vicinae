@@ -19,6 +19,7 @@
 #include "builtins/system/system-extension.hpp"
 #include "builtins/ai/ai-extension.hpp"
 #include "builtins/dictation/dictation-extension.hpp"
+#include "extensions/history/history-extension.hpp"
 #include "service-registry.hpp"
 #include <memory>
 
@@ -39,6 +40,7 @@ CommandDatabase::CommandDatabase(const ServiceRegistry &services) {
   registerRepository<FileExtension>();
   registerRepository<PowerManagementExtension>();
   registerRepository<BrowserExtension>();
+  registerRepository<HistoryExtension>();
 
 #ifdef HAS_TYPESCRIPT_EXTENSIONS
   registerRepository<RaycastCompatExtension>();
