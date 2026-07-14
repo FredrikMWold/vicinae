@@ -40,6 +40,7 @@ class UpdateService;
 class AudioControlService;
 class AppRuntime;
 class GlobalShortcutService;
+class RootSearchHistoryService;
 
 namespace config {
 class Manager;
@@ -86,6 +87,7 @@ public:
   AudioControlService *audioControl() const;
   AppRuntime *appRuntime() const;
   GlobalShortcutService *globalShortcuts() const;
+  RootSearchHistoryService *rootSearchHistory() const;
 
   void setPowerManager(std::unique_ptr<PowerManager> manager);
   void setWindowManager(std::unique_ptr<WindowManager> manager);
@@ -125,6 +127,7 @@ public:
   void setAudioControl(std::unique_ptr<AudioControlService> service);
   void setAppRuntime(std::unique_ptr<AppRuntime> service);
   void setGlobalShortcuts(std::unique_ptr<GlobalShortcutService> service);
+  void setRootSearchHistory(std::unique_ptr<RootSearchHistoryService> service);
 
 private:
   std::unique_ptr<WindowManager> m_windowManager;
@@ -132,6 +135,7 @@ private:
   std::unique_ptr<AppService> m_appDb;
   std::unique_ptr<OmniDatabase> m_omniDb;
   std::unique_ptr<LocalStorageService> m_localStorage;
+  std::unique_ptr<RootSearchHistoryService> m_rootSearchHistory;
   std::unique_ptr<ExtensionManager> m_extensionManager;
   std::unique_ptr<ClipboardService> m_clipman;
   std::unique_ptr<FontService> m_fontService;

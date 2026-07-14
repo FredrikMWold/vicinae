@@ -122,8 +122,10 @@ public:
   std::unique_ptr<ActionPanelState> buildState(ApplicationContext *ctx) const override;
 
   void setTypeFiltering(bool filter = true);
+  void setFileHistoryRecording(bool record = true);
 
 private:
   bool m_typeFiltered = true;
+  bool m_recordFileHistory = false;
   QString m_target;
 };

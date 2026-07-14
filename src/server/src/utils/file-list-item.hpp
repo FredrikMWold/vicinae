@@ -10,6 +10,7 @@
 #include "service-registry.hpp"
 #include "services/app-service/app-service.hpp"
 #include "internal/keyboard/keyboard.hpp"
+#include "services/root-search-history/root-search-history-service.hpp"
 #include "services/toast/toast-service.hpp"
 #include "services/wallpaper/wallpaper-manager.hpp"
 #include <qmimedatabase.h>
@@ -40,6 +41,7 @@ public:
       return;
     }
 
+    if (auto *history = ctx->services->rootSearchHistory()) history->recordFile(m_path);
     files->saveAccess(m_path);
     ctx->navigation->closeWindow();
   }
@@ -63,8 +65,9 @@ public:
     auto const wallpaper = ctx->services->wallpaperManager();
 
     wallpaper->setWallpaper({.path = m_path.string()})
-        .then(toast, [ctx, toast](const std::expected<void, std::string> &result) {
+        .then(toast, [ctx, toast, path = m_path](const std::expected<void, std::string> &result) {
           if (result) {
+            if (auto *history = ctx->services->rootSearchHistory()) history->recordFile(path);
             ctx->navigation->showHud(tr("Wallpaper set"), ImageURL::builtin(BuiltinIcon::Image));
           } else {
             toast->failure(tr("Failed to set wallpaper"), QString::fromStdString(result.error()));
@@ -94,7 +97,9 @@ inline std::unique_ptr<ActionPanelState> actionPanel(const std::filesystem::path
 
   if (fileBrowser) { section->addAction(new RevealFileInFolderAction(path)); }
 
-  section->addAction(new OpenWithAction(QString::fromStdString(path.string())));
+  auto *openWith = new OpenWithAction(QString::fromStdString(path.string()));
+  openWith->setFileHistoryRecording();
+  section->addAction(openWith);
 
   if (mime.name().startsWith("image/") && ctx->services->wallpaperManager()->canSetWallpaper()) {
     section->addAction(new SetWallpaperAction(path));

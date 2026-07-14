@@ -6,8 +6,30 @@
 #include "command-actions.hpp"
 #include "common.hpp"
 #include "extension/extension-command.hpp"
-#include "navigation-controller.hpp"
+#include "service-registry.hpp"
+#include "services/root-search-history/root-search-history-service.hpp"
 #include "services/root-item-manager/root-item-manager.hpp"
+
+#include <utility>
+
+namespace {
+class RecordCommandHistoryAction : public ProxyAction {
+public:
+  RecordCommandHistoryAction(AbstractAction *action, EntrypointId commandId)
+      : ProxyAction(action), m_commandId(std::move(commandId)) {
+    setAutoClose(action->autoClose());
+    setStyle(action->style());
+    if (auto shortcut = action->shortcut()) addShortcut(*shortcut);
+  }
+
+  void executeAfter(ApplicationContext *ctx) override {
+    if (auto *history = ctx->services->rootSearchHistory()) history->recordCommand(m_commandId);
+  }
+
+private:
+  EntrypointId m_commandId;
+};
+} // namespace
 
 QString CommandRootItem::title() const { return m_command->name(); }
 
@@ -39,15 +61,20 @@ std::unique_ptr<ActionPanelState> CommandRootItem::newActionPanel(ApplicationCon
   mainSection->addAction(open);
 
   for (const auto action : RootSearchActionGenerator::generateActions(*this, metadata)) {
-    itemSection->addAction(action);
+    if (action->isSubmenu()) {
+      itemSection->addAction(action);
+    } else {
+      itemSection->addAction(new RecordCommandHistoryAction(action, uniqueId()));
+    }
   }
 
   if (auto cmd = dynamic_cast<ExtensionCommand *>(m_command.get())) {
     auto copyLocation = new CopyToClipboardAction(
         Clipboard::Text(QString::fromStdString(cmd->path().string())), tr("Copy extension path"));
 
-    extensionSection->addAction(copyLocation);
-    dangerSection->addAction(new UninstallExtensionAction(cmd->extensionId()));
+    extensionSection->addAction(new RecordCommandHistoryAction(copyLocation, uniqueId()));
+    dangerSection->addAction(
+        new RecordCommandHistoryAction(new UninstallExtensionAction(cmd->extensionId()), uniqueId()));
   }
 
   return panel;

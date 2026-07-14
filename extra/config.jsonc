@@ -204,6 +204,7 @@
 		// common shortcuts
 		// "open-search-filter": "control+P",
 		// "open-settings": "control+,",
+		// "open-command-history": "control+R",
 		// "toggle-action-panel": "control+B", (control+K on macOS)
 
 		// used to assign shortcuts to generic actions
@@ -220,7 +221,7 @@
 		// "action.new": "control+N",
 		// "action.open": "control+O",
 		// "action.pin": "control+shift+P",
-		// "action.refresh": "control+R",
+		// "action.refresh": "control+shift+R",
 		// "action.remove": "control+X",
 		// "action.save": "control+S"
 	},

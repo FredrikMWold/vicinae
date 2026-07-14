@@ -23,6 +23,7 @@
 #include "services/raycast/raycast-store.hpp"
 #include "services/extension-store/vicinae-store.hpp"
 #include "services/root-item-manager/root-item-manager.hpp"
+#include "services/root-search-history/root-search-history-service.hpp"
 #include "services/telemetry/telemetry-service.hpp"
 #include "services/update/update-service.hpp"
 #include "services/toast/toast-service.hpp"
@@ -92,6 +93,8 @@ AudioControlService *ServiceRegistry::audioControl() const { return m_audioContr
 
 AppRuntime *ServiceRegistry::appRuntime() const { return m_appRuntime.get(); }
 
+RootSearchHistoryService *ServiceRegistry::rootSearchHistory() const { return m_rootSearchHistory.get(); }
+
 void ServiceRegistry::setPowerManager(std::unique_ptr<PowerManager> powman) {
   m_powerManager = std::move(powman);
 }
@@ -141,6 +144,9 @@ void ServiceRegistry::setOmniDb(std::unique_ptr<OmniDatabase> service) { m_omniD
 
 void ServiceRegistry::setLocalStorage(std::unique_ptr<LocalStorageService> service) {
   m_localStorage = std::move(service);
+}
+void ServiceRegistry::setRootSearchHistory(std::unique_ptr<RootSearchHistoryService> service) {
+  m_rootSearchHistory = std::move(service);
 }
 void ServiceRegistry::setExtensionManager(std::unique_ptr<ExtensionManager> service) {
   m_extensionManager = std::move(service);

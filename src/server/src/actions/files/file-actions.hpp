@@ -3,6 +3,7 @@
 #include "actions/app/app-actions.hpp"
 #include "service-registry.hpp"
 #include "services/files-service/file-service.hpp"
+#include "services/root-search-history/root-search-history-service.hpp"
 
 class OpenFileAction : public OpenAppAction {
 public:
@@ -10,6 +11,7 @@ public:
     auto files = ctx->services->fileService();
 
     OpenAppAction::execute(ctx);
+    if (auto *history = ctx->services->rootSearchHistory()) history->recordFile(m_path);
     files->saveAccess(m_path);
   }
 
@@ -31,6 +33,7 @@ public:
     auto files = ctx->services->fileService();
 
     OpenAppAction::execute(ctx);
+    if (auto *history = ctx->services->rootSearchHistory()) history->recordFile(m_path);
     files->saveAccess(m_path);
   }
 

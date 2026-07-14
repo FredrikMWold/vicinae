@@ -199,6 +199,7 @@ public:
 
   bool executePrimaryAction();
   void executeAction(AbstractAction *action);
+  void recordCommandHistory(const EntrypointId &commandId);
 
 private:
   void executeActionNow(AbstractAction *action);

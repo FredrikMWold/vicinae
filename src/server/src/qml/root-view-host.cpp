@@ -1,5 +1,7 @@
 #include "root-view-host.hpp"
+#include "common/entrypoint.hpp"
 #include "root-search-model.hpp"
+#include "root-search/extensions/extension-root-provider.hpp"
 #include "section-source.hpp"
 #include "service-registry.hpp"
 #include "services/keybinding/keybinding-service.hpp"

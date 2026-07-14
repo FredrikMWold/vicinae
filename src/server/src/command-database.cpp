@@ -3,6 +3,7 @@
 #include "extensions/clipboard/clipboard-extension.hpp"
 #include "extensions/calculator/calculator-extension.hpp"
 #include "extensions/file/file-extension.hpp"
+#include "extensions/history/history-extension.hpp"
 #include "extensions/internal/internal-extension.hpp"
 #include "extensions/power-management/power-management-extension.hpp"
 #include "extensions/shortcut/shortcut-extension.hpp"
@@ -34,6 +35,7 @@ CommandDatabase::CommandDatabase(const ServiceRegistry &services) {
   registerRepository<FileExtension>();
   registerRepository<PowerManagementExtension>();
   registerRepository<BrowserExtension>();
+  registerRepository<HistoryExtension>();
 
 #ifdef HAS_TYPESCRIPT_EXTENSIONS
   registerRepository<RaycastCompatExtension>();

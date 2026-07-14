@@ -29,6 +29,13 @@ static const std::unordered_map<Keybind, KeybindInfo> &keybindInfos() {
 		.icon = "cog",
 		.dflt = Keyboard::Shortcut(Qt::Key_Comma, Qt::ControlModifier)
 	}},
+	{Keybind::OpenCommandHistory, KeybindInfo{
+		.id = "open-command-history",
+		.name = "Open command history",
+		.description = "Open the command history view from the launcher window",
+		.icon = "clock",
+		.dflt = Keyboard::Shortcut(Qt::Key_R, Qt::ControlModifier)
+	}},
 	{Keybind::OpenAction, KeybindInfo{
 		.id = "action.open",
 		.name = QCoreApplication::translate("keybind-manager", "Generic Open Action"),
@@ -97,7 +104,7 @@ static const std::unordered_map<Keybind, KeybindInfo> &keybindInfos() {
 			.name = QCoreApplication::translate("keybind-manager", "Generic Refresh Action"),
 			.description = QCoreApplication::translate("keybind-manager", "Can be used by actions that can refresh the selected item"),
 			 .icon = "arrow-clockwise",
-			.dflt = Keyboard::Shortcut(Qt::Key_R, Qt::ControlModifier)
+			.dflt = Keyboard::Shortcut(Qt::Key_R, Qt::ControlModifier | Qt::ShiftModifier)
 	}},
 	{Keybind::PinAction, KeybindInfo{
 		.id = "action.pin",

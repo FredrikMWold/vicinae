@@ -580,6 +580,10 @@ bool LauncherWindow::forwardKey(int key, int modifiers) {
     return true;
   }
 
+  if (Keyboard::Shortcut(Keybind::OpenCommandHistory) == &event) {
+    return m_ctx.navigation->activateEntrypoint(EntrypointId{"history", "search"});
+  }
+
   return false;
 }
 
