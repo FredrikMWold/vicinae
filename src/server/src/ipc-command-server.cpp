@@ -140,6 +140,15 @@ std::expected<ArgumentValues, std::string> buildLaunchArguments(const Entrypoint
 
 LaunchContext makeLaunchContext(const ipc_gen::LaunchCommandRequest &req) { return LaunchContext{}; }
 
+using LaunchCommandResult = ipc_gen::Result<ipc_gen::LaunchCommandResponse>;
+
+LaunchCommandResult::Future waitForWindowClose(NavigationController *navigation) {
+  if (!navigation || !navigation->isWindowOpened()) { return LaunchCommandResult::ok({}); }
+
+  return QtFuture::connect(navigation, &NavigationController::windowVisiblityChanged)
+      .then([](bool) -> LaunchCommandResult::Type { return ipc_gen::LaunchCommandResponse{}; });
+}
+
 } // namespace
 
 ipc_gen::Result<ipc_gen::PingResponse>::Future IpcService::ping() {
@@ -258,10 +267,13 @@ IpcService::launchCommand(ipc_gen::LaunchCommandRequest req) {
       .fallbackText = req.query.transform(QString::fromStdString),
       .cwd = req.cwd.transform(QString::fromStdString),
   };
+  bool const wait = req.wait.value_or(false);
 
   if (!m_ctx.navigation->activateEntrypoint(id, {.props = props, .toggleIfAlreadyActive = false})) {
     return ipc_gen::Result<ipc_gen::LaunchCommandResponse>::fail("Failed to launch command");
   }
+
+  if (wait) { return waitForWindowClose(m_ctx.navigation.get()); }
 
   return ipc_gen::Result<ipc_gen::LaunchCommandResponse>::ok({});
 }

@@ -230,6 +230,7 @@ class LaunchCommandCommand : public AbstractCommandLineCommand {
     app->add_option("args", m_args, "Arguments to pass to the command");
     app->add_option("--cwd", m_cwd, "Working directory forwarded to the command");
     app->add_option("--query,-q", m_query, "");
+    app->add_flag("--wait", m_wait, "Wait until the launcher window closes");
   }
 
   bool run(CLI::App *) override {
@@ -241,7 +242,8 @@ class LaunchCommandCommand : public AbstractCommandLineCommand {
     }
 
     auto res = cli::IpcClient::connect().and_then([&](cli::IpcClient client) {
-      return client.launchCommand({.entrypoint = m_entrypoint, .args = m_args, .cwd = cwd, .query = m_query});
+      return client.launchCommand(
+          {.entrypoint = m_entrypoint, .args = m_args, .cwd = cwd, .query = m_query, .wait = m_wait});
     });
 
     if (!res) {
@@ -257,6 +259,7 @@ private:
   std::optional<std::string> m_cwd;
   std::optional<std::string> m_query;
   std::vector<std::string> m_args;
+  bool m_wait = false;
 };
 
 class CommandCommand : public AbstractCommandLineCommand {
