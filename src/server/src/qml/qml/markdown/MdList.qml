@@ -61,6 +61,8 @@ ColumnLayout {
                     }
                     text: itemDelegate.modelData.html ?? ""
 
+                    MarkdownLinkCursor {}
+
                     Component.onCompleted: if (root.selectionController)
                         root.selectionController.registerSelectable(itemText, root.blockIndex * 10000 + itemDelegate.index, true)
                     Component.onDestruction: if (root.selectionController)

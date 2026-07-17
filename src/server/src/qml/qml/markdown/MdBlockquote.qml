@@ -53,6 +53,8 @@ Item {
                     }
                     text: modelData ?? ""
 
+                    MarkdownLinkCursor {}
+
                     required property var modelData
                     required property int index
 

@@ -26,6 +26,8 @@ TextEdit {
 
     text: blockData.html ?? ""
 
+    MarkdownLinkCursor {}
+
     onSelectionControllerChanged: if (selectionController)
         selectionController.registerSelectable(root, blockIndex * 10000, true)
     Component.onDestruction: if (selectionController)

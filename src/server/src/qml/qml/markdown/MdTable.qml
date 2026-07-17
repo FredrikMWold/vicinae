@@ -95,6 +95,8 @@ Rectangle {
                             horizontalAlignment: root.textAlignment(index)
                             text: modelData.html ?? ""
 
+                            MarkdownLinkCursor {}
+
                             Component.onCompleted: if (root.selectionController)
                                 root.selectionController.registerSelectable(headerText, root.blockIndex * 10000 + index, true)
                             Component.onDestruction: if (root.selectionController)
@@ -164,6 +166,8 @@ Rectangle {
                                 }
                                 horizontalAlignment: root.textAlignment(index)
                                 text: modelData.html ?? ""
+
+                                MarkdownLinkCursor {}
 
                                 Component.onCompleted: if (root.selectionController)
                                     root.selectionController.registerSelectable(cellText, root.blockIndex * 10000 + 100 + rowIdx * root.columnCount + index, true)

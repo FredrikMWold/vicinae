@@ -1044,6 +1044,7 @@ set(VICINAE_QML_FILES
 	src/qml/qml/ImageViewer.qml
 	src/qml/qml/markdown/MarkdownView.qml
 	src/qml/qml/markdown/MarkdownText.qml
+	src/qml/qml/markdown/MarkdownLinkCursor.qml
 	src/qml/qml/markdown/MdHeading.qml
 	src/qml/qml/markdown/MdParagraph.qml
 	src/qml/qml/markdown/MdCodeBlock.qml
