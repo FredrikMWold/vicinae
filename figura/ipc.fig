@@ -35,6 +35,7 @@ struct LaunchCommandRequest {
   args: string[];
   cwd?: string;
   query?: string;
+  wait?: bool;
 };
 
 struct LaunchCommandResponse {

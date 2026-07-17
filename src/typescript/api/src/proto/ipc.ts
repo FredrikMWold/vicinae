@@ -120,6 +120,7 @@ export type LaunchCommandRequest = {
 	args: string[];
 	cwd?: string;
 	query?: string;
+	wait?: boolean;
 }
 
 export type LaunchCommandResponse = {
