@@ -24,6 +24,8 @@ Item {
 
     width: compact ? Math.max(triggerButton.implicitWidth, minimumWidth) : implicitWidth
 
+    readonly property int _cornerRadius: Config.borderRounding
+    readonly property int _popupGap: 4
     property real _closedTime: 0
 
     function open() {
@@ -61,7 +63,7 @@ Item {
         anchors.fill: compact ? null : parent
         width: compact ? root.width : implicitWidth
         height: compact ? 28 : implicitHeight
-        radius: compact ? 6 : 8
+        radius: root._cornerRadius
         color: "transparent"
         border.color: Config.withAlpha(root.hasError ? Theme.inputBorderError : (root.activeFocus || completionPopup.visible ? Theme.inputBorderFocus : (compact ? Theme.divider : Theme.inputBorder)), Config.surfaceOpacity)
         border.width: 1
@@ -106,15 +108,24 @@ Item {
         }
     }
 
+    Item {
+        id: popupAnchor
+        x: triggerButton.x
+        y: triggerButton.y
+        width: triggerButton.width
+        height: triggerButton.height + root._popupGap
+        visible: false
+    }
+
     CompletionPopup {
         id: completionPopup
-        parent: triggerButton
+        parent: popupAnchor
         popupType: Platform.preferItemPopup("dropdown") ? Popup.Item : Popup.Window
         // On Wayland the compositor places the native popup window from the
         // PopupPlacement anchor; x/y only apply on other platforms.
         PopupPlacement.alignment: root.compact ? Qt.AlignRight : Qt.AlignLeft
         x: root.popupX()
-        y: triggerButton.height + 4
+        y: popupAnchor.height
         width: Math.max(compact ? 200 : 250, root.width)
         focus: true
         sections: root.items
@@ -125,7 +136,7 @@ Item {
         background: Rectangle {
             readonly property bool csd: completionPopup.popupType === Popup.Item || Platform.supports("clientSideDecorations")
             readonly property real bgOpacity: completionPopup.popupType === Popup.Window ? Config.popupOpacity : 1
-            radius: csd ? Math.min(Config.borderRounding, 15) : 0
+            radius: csd ? root._cornerRadius : 0
             color: Qt.rgba(Theme.popoverBackground.r, Theme.popoverBackground.g, Theme.popoverBackground.b, bgOpacity)
             border.color: Config.withAlpha(Theme.popoverBorder, bgOpacity)
             border.width: csd ? 1 : 0
