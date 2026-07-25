@@ -277,6 +277,7 @@ Popup {
                         }
 
                         Text {
+                            id: titleText
                             text: del.title
                             color: del._isHighlighted ? Theme.listItemSelectionFg : Theme.foreground
                             font.pointSize: Theme.smallerFontSize
@@ -290,6 +291,11 @@ Popup {
                             color: del._isHighlighted ? Theme.listItemSelectionFg : Theme.foreground
                             font.pointSize: Theme.smallerFontSize
                         }
+                    }
+
+                    ViciToolTip {
+                        visible: itemHover.hovered && HoverActivation.active && titleText.truncated
+                        text: del.title
                     }
 
                     HoverHandler {
