@@ -55,7 +55,10 @@ Popup {
         if (showFilter) {
             filterField.text = "";
             _model.setFilter("");
-            _highlightCurrentOrFirst();
+            if (currentItemId !== "")
+                _highlightedIndex = -1;
+            else
+                _highlightFirst();
             filterField.forceActiveFocus();
         }
     }
@@ -64,14 +67,7 @@ Popup {
             close();
     }
 
-    function _highlightCurrentOrFirst() {
-        if (currentItemId !== "") {
-            const idx = _model.indexOfItemId(currentItemId);
-            if (idx >= 0) {
-                _highlightedIndex = idx;
-                return;
-            }
-        }
+    function _highlightFirst() {
         const first = _model.nextSelectableIndex(-1, 1);
         _highlightedIndex = first >= 0 ? first : -1;
     }
