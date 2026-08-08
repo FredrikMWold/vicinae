@@ -17,7 +17,7 @@ public:
   QString itemId(int index) const override;
   QString itemTitle(int index) const override;
   QString itemSubtitle(int index) const override;
-  QVariantList itemAccessories(int index) const override;
+  AccessoryList itemAccessories(int index) const override;
   std::optional<ImageURL> itemIcon(int index) const override;
   std::unique_ptr<ActionPanelState> actionPanel(int index) const override;
   void setFilter(std::string_view query) override;

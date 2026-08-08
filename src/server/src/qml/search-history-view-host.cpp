@@ -99,8 +99,8 @@ QString SearchHistorySection::itemSubtitle(int index) const {
   return {};
 }
 
-QVariantList SearchHistorySection::itemAccessories(int index) const {
-  if (auto entry = entryAt(index)) return qml::textAccessory(usageTextFor(*entry));
+AccessoryList SearchHistorySection::itemAccessories(int index) const {
+  if (auto entry = entryAt(index)) return {{.text = usageTextFor(*entry)}};
   return {};
 }
 

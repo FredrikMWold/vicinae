@@ -1,0 +1,23 @@
+set(CUSTOM_STORE_SOURCES
+  src/custom-store/custom-store-types.hpp
+  src/custom-store/custom-store-types.cpp
+  src/custom-store/custom-store-database.hpp
+  src/custom-store/custom-store-database.cpp
+  src/custom-store/custom-store-service.hpp
+  src/custom-store/custom-store-service.cpp
+  src/custom-store/custom-store-installer.hpp
+  src/custom-store/custom-store-installer.cpp
+  src/custom-store/custom-store-form-view-host.hpp
+  src/custom-store/custom-store-form-view-host.cpp
+  src/custom-store/custom-store-root-provider.hpp
+  src/custom-store/custom-store-root-provider.cpp
+  src/custom-store/custom-store-model.hpp
+  src/custom-store/custom-store-model.cpp
+  src/custom-store/custom-store-view-host.hpp
+  src/custom-store/custom-store-view-host.cpp
+)
+
+set(CUSTOM_STORE_QML_FILES
+  src/custom-store/qml/CustomStoreFormView.qml
+  src/custom-store/qml/CustomStoreListingView.qml
+)

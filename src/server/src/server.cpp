@@ -1,5 +1,6 @@
 #include "config/config.hpp"
 #include "environment.hpp"
+#include "custom-store/custom-store-root-provider.hpp"
 #include <QStyleHints>
 #include "extension/extension.hpp"
 #include "root-search/browser-tabs/browser-tabs-provider.hpp"
@@ -408,6 +409,8 @@ int startServer(const ServerLaunchOptions &launchOpts) {
     root->loadProvider(std::make_unique<AppRootProvider>(*registry->appDb()));
     root->loadProvider(std::make_unique<ShortcutRootProvider>(*registry->shortcuts()));
     root->loadProvider(std::make_unique<ScriptRootProvider>(*registry->scriptDb()));
+    root->loadProvider(
+      std::make_unique<CustomStoreRootProvider>(Omnicast::dataDir() / "custom-stores"));
     root->loadProvider(std::make_unique<BrowserTabProvider>(*registry->browserExtension()));
 #ifdef Q_OS_MACOS
     root->loadProvider(std::make_unique<MacSettingsRootProvider>());

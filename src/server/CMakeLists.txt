@@ -43,6 +43,8 @@ endif()
 set(ASSET_PATH ${CMAKE_CURRENT_SOURCE_DIR}/assets)
 set(EXTRA_PATH ${CMAKE_SOURCE_DIR}/extra)
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/src/custom-store/custom-store.cmake)
+
 if (UNIX AND NOT APPLE)
 	set(DEFAULT_FONT_RESOURCES
 "  	<file alias=\"Outfit-Variable.ttf\">${ASSET_PATH}/fonts/Outfit-Variable.ttf</file>
@@ -83,6 +85,8 @@ include_directories(
 )
 
 set(SRCS
+	${CUSTOM_STORE_SOURCES}
+
 	src/main.cpp
 
 	src/theme.hpp
@@ -977,6 +981,8 @@ if(APPLE)
 endif()
 
 set(VICINAE_QML_FILES
+	${CUSTOM_STORE_QML_FILES}
+
 	src/qml/qml/LauncherWindow.qml
 	src/qml/qml/PopupMaterial.qml
 	src/qml/qml/ViciPopover.qml
